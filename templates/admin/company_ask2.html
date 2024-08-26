@@ -1,0 +1,194 @@
+
+{% load static %}
+
+{% block content %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 20px;
+            
+        }
+        .table-container {
+            margin-top: 50px;
+            margin-left: 140px;
+            font-family: 'Arial MT Rounded';
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            text-align: center;
+            padding: 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid black;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        td {
+            word-wrap: break-word;
+            white-space: normal;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, .05);
+        }
+        .form-control {
+            border: none !important;
+            background-color: transparent !important;
+            text-align: left;
+            box-shadow: none !important;
+        }
+        .form-control:focus {
+            background-color: transparent !important;
+            outline: none;
+            box-shadow: none !important;
+            text-align: left;
+        }
+        .add-row-button, .edit-button, .delete-button {
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        .breadcrumb{
+            margin-top: 20px;
+            margin-left: 250px;
+            font-size: 25px !important;
+            color:black;
+            font-family: 'Arial MT Rounded';
+        }          
+        .bold-text {
+            font-weight: bold;
+        }
+        html, body {
+    overflow: hidden; /* Hides the scrollbars */
+}
+
+       
+    </style>
+</head>
+<body>
+    {% include './company_profile.html' %}
+    <div class="breadcrumb">
+        <span>My Companies</span> &ndash; <span>{{ company.name }}</span> &ndash; <span class="bold-text">Company Ask</span>
+    </div>
+
+
+<div class="container">
+    <div id="tableContainer" class="table-container">
+        <table id="capTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Ask</th>
+                    <th>Value</th>
+                    <th>Equity Share</th>
+                    <th>Details</th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+        <div class="text-center mt-3">
+            <span class="add-row-button" onclick="showEntryRow()">+ Add Row</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let rows = [];
+    let editIndex = -1;
+
+    function showEntryRow() {
+        const tableBody = document.getElementById('tableBody');
+        const entryRow = document.createElement('tr');
+        entryRow.innerHTML = `
+            <td><input type="text" class="form-control" id="askInput"></td>
+            <td><input type="text" class="form-control" id="valueInput"></td>
+            <td><input type="text" class="form-control" id="equityShareInput"></td>
+            <td><input type="text" class="form-control" id="detailsInput"></td>
+            <td><button class="btn btn-primary btn-sm" onclick="saveRow()">Add</button></td>
+        `;
+        tableBody.appendChild(entryRow);
+    }
+
+    function saveRow() {
+        const row = {
+            ask: document.getElementById('askInput').value,
+            value: document.getElementById('valueInput').value,
+            equityShare: document.getElementById('equityShareInput').value,
+            details: document.getElementById('detailsInput').value
+        };
+        if (editIndex === -1) {
+            rows.push(row);
+        } else {
+            rows[editIndex] = row;
+            editIndex = -1;
+        }
+        renderRows();
+    }
+
+    function renderRows() {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        rows.forEach((row, index) => {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${row.ask}</td>
+                <td>${row.value}</td>
+                <td>${row.equityShare}</td>
+                <td>${row.details}</td>
+                <td>
+                    <span class="edit-button" onclick="editRow(${index})">&#9998;</span>
+                    <span class="delete-button" onclick="deleteRow(${index})">&#10060;</span>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+    }
+
+    function deleteRow(index) {
+        rows.splice(index, 1);
+        renderRows();
+    }
+
+    function editRow(index) {
+        editIndex = index;
+        const row = rows[index];
+        const tableRow = document.getElementById('tableBody').children[index];
+        tableRow.innerHTML = `
+            <td><input type="text" class="form-control" value="${row.ask}"></td>
+            <td><input type="text" class="form-control" value="${row.value}"></td>
+            <td><input type="text" class="form-control" value="${row.equityShare}"></td>
+            <td><input type="text" class="form-control" value="${row.details}"></td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="saveEditedRow(${index})">Save Changes</button>
+                <button class="btn btn-secondary btn-sm" onclick="cancelEdit()">Cancel</button>
+            </td>
+        `;
+    }
+
+    function saveEditedRow(index) {
+        const row = rows[index];
+        row.ask = document.querySelector(`#tableBody tr:nth-child(${index + 1}) input:nth-child(1)`).value;
+        row.value = document.querySelector(`#tableBody tr:nth-child(${index + 1}) input:nth-child(2)`).value;
+        row.equityShare = document.querySelector(`#tableBody tr:nth-child(${index + 1}) input:nth-child(3)`).value;
+        row.details = document.querySelector(`#tableBody tr:nth-child(${index + 1}) input:nth-child(4)`).value;
+        renderRows();
+    }
+
+    function cancelEdit() {
+        renderRows();
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock content %}

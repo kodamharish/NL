@@ -1,0 +1,358 @@
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 20px;
+            font-family: 'Arial MT Rounded' !important;
+        }
+        .table-container {
+            margin-top: 50px;
+            margin-left: 140px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-family: 'Arial MT Rounded';
+        }
+        th, td {
+            text-align: center;
+            padding: 10px;
+            vertical-align: middle; 
+            border-bottom: 1px solid black;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        td {
+            word-wrap: break-word;
+            white-space: normal;
+            text-align: left;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, .05);
+        }
+        .form-control {
+            border: none !important;
+            background-color: transparent !important;
+            text-align: left;
+            box-shadow: none !important;
+        }
+        .form-control:focus {
+            background-color: transparent !important;
+            outline: none;
+            box-shadow: none !important;
+        }
+        .add-row-button, .edit-button, .delete-button {
+            cursor: pointer;
+            font-size: 1.25rem;  
+        }
+        .breadcrumb {
+            margin-top: 20px;
+            margin-left: 250px;
+            font-size: 25px !important;
+            color: black;
+            align-items: left;
+        }          
+        .bold-text {
+            font-weight: bold;
+        }
+        html, body {
+            overflow: hidden; /* Hides the scrollbars */
+        }
+    </style>
+</head>
+<body>
+
+    {% include './company_profile.html' %}
+    <div class="breadcrumb">
+        <span>My Companies</span> &ndash; <span>{{ company.name }}</span> &ndash; <span class="bold-text">Cap Table</span>
+    </div>  
+    <div class="container">
+        <div id="tableContainer" class="table-container">
+            <table id="capTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Shareholder</th>
+                        <th>Name</th>
+                        <th>Equity Share</th>
+                        <th>Invested Since</th>
+                        <th>Investment Amount</th>
+                        <th>Valuation</th>
+                        <th>Details</th>
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for entry in cap_table %}
+                        <tr>
+                            <td>{{ entry.shareholder }}</td>
+                            <td>{{ entry.name }}</td>
+                            <td>{{ entry.percentage_of_shares }}</td>
+                            <td>{{ entry.investedsince }}</td>
+                            <td>{{ entry.amount }}</td>
+                            <td>{{ entry.valuation }}</td>
+                            <td>{{ entry.details }}</td>
+                            <td>
+                                <span class="edit-button" onclick="editRow('{{ forloop.counter0 }}', '{{ entry.id }}')">&#9998;</span>
+                                <span class="delete-button" onclick="deleteRow('{{ forloop.counter0 }}', '{{ entry.id }}')">&#10060;</span>
+                            </td>   
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center mt-3">
+                <span class="add-row-button" onclick="showEntryRow()">+ Add Row</span>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let rows = [];
+
+    // Populate the rows array based on the table content
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById('tableBody');
+        const tableRows = tableBody.querySelectorAll('tr');
+
+        // Populate rows array with the data
+        rows = Array.from(tableRows).map((row) => {
+            return {
+                shareholder: row.cells[0].innerText,
+                name: row.cells[1].innerText,
+                equityShare: row.cells[2].innerText,
+                investedSince: row.cells[3].innerText,
+                investmentAmount: row.cells[4].innerText,
+                valuation: row.cells[5].innerText,
+                details: row.cells[6].innerText
+            };
+        });
+    });
+
+    function showEntryRow() {
+        const tableBody = document.getElementById('tableBody');
+
+        const existingEntryRow = document.getElementById('entryRow');
+        if (existingEntryRow) {
+            existingEntryRow.remove();
+        }
+
+        const entryRow = document.createElement('tr');
+        entryRow.setAttribute('id', 'entryRow');
+        entryRow.innerHTML = `
+            <td>
+                <select class="form-control" id="shareholderInput">
+                    <option value="Founder">Founder</option>
+                    <option value="Executive">Executive</option>
+                    <option value="Investor">Investor</option>
+                    <option value="Incubator">Incubator</option>
+                    <option value="Accelerator">Accelerator</option>
+                    <option value="Government">Government</option>
+                    <option value="Others">Others</option>
+                </select>
+            </td>
+            <td><input type="text" class="form-control" id="nameInput"></td>
+            <td><input type="text" class="form-control" id="equityShareInput"></td>
+            <td><input type="date" class="form-control" id="investedSinceInput"></td>
+            <td><input type="text" class="form-control" id="investmentAmountInput"></td>
+            <td><input type="text" class="form-control" id="valuationInput"></td>
+            <td><input type="text" class="form-control" id="detailsInput"></td>
+            <td><button class="btn btn-primary btn-sm" onclick="saveRow()">Add</button></td>
+        `;
+        tableBody.appendChild(entryRow);
+    }
+
+    function saveRow() {
+        const row = {
+            shareholder: document.getElementById('shareholderInput').value,
+            name: document.getElementById('nameInput').value,
+            equityShare: document.getElementById('equityShareInput').value,
+            investedSince: document.getElementById('investedSinceInput').value,
+            investmentAmount: document.getElementById('investmentAmountInput').value,
+            valuation: document.getElementById('valuationInput').value,
+            details: document.getElementById('detailsInput').value
+        };
+
+        sendRowData(row);
+    }
+
+    function appendRow(row) {
+        const tableBody = document.getElementById('tableBody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${row.shareholder}</td>
+            <td>${row.name}</td>
+            <td>${row.equityShare}</td>
+            <td>${row.investedSince}</td>
+            <td>${row.investmentAmount}</td>
+            <td>${row.valuation}</td>
+            <td>${row.details}</td>
+            <td>
+                <span class="edit-button" onclick="editRow(${rows.length - 1}, ${row.id})">&#9998;</span>
+                <span class="delete-button" onclick="deleteRow(${rows.length - 1}, ${row.id})">&#10060;</span>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+
+    function editRow(index, rowId) {
+        // Ensure the index is within bounds
+        if (index < 0 || index >= rows.length) {
+            console.error('Invalid index:', index);
+            return;
+        }
+
+        // Get the row data from the rows array
+        const data = rows[index];
+
+        // Ensure that data is not undefined
+        if (!data) {
+            console.error('Data not found for index:', index);
+            return;
+        }
+
+        // Convert the date to the correct format
+        const formattedDate = formatDateToYYYYMMDD(data.investedSince);
+
+        // Proceed with editing the row
+        const row = document.querySelector(`#tableBody tr:nth-child(${parseInt(index) + 1})`);
+        row.innerHTML = `
+            <td>
+                <select class="form-control" id="shareholderInput">
+                    <option value="Founder" ${data.shareholder === 'Founder' ? 'selected' : ''}>Founder</option>
+                    <option value="Executive" ${data.shareholder === 'Executive' ? 'selected' : ''}>Executive</option>
+                    <option value="Investor" ${data.shareholder === 'Investor' ? 'selected' : ''}>Investor</option>
+                    <option value="Incubator" ${data.shareholder === 'Incubator' ? 'selected' : ''}>Incubator</option>
+                    <option value="Accelerator" ${data.shareholder === 'Accelerator' ? 'selected' : ''}>Accelerator</option>
+                    <option value="Government" ${data.shareholder === 'Government' ? 'selected' : ''}>Government</option>
+                    <option value="Others" ${data.shareholder === 'Others' ? 'selected' : ''}>Others</option>
+                </select>
+            </td>
+            <td><input type="text" class="form-control" id="nameInput" value="${data.name}"></td>
+            <td><input type="text" class="form-control" id="equityShareInput" value="${data.equityShare}"></td>
+            <td><input type="date" class="form-control" id="investedSinceInput" value="${formattedDate}"></td>
+            <td><input type="text" class="form-control" id="investmentAmountInput" value="${data.investmentAmount}"></td>
+            <td><input type="text" class="form-control" id="valuationInput" value="${data.valuation}"></td>
+            <td><input type="text" class="form-control" id="detailsInput" value="${data.details}"></td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="saveEditedRow(${index}, ${rowId})">Save Changes</button>
+                <button class="btn btn-secondary btn-sm" onclick="cancelEdit()">Cancel</button>
+            </td>
+        `;
+    }
+
+    function saveEditedRow(index, rowId) {
+        const updatedRow = {
+            id: rowId,
+            shareholder: document.getElementById('shareholderInput').value,
+            name: document.getElementById('nameInput').value,
+            equityShare: document.getElementById('equityShareInput').value,
+            investedSince: formatDateToYYYYMMDD(document.getElementById('investedSinceInput').value),
+            investmentAmount: document.getElementById('investmentAmountInput').value,
+            valuation: document.getElementById('valuationInput').value,
+            details: document.getElementById('detailsInput').value
+        };
+
+        // Update the existing row in the rows array
+        rows[index] = updatedRow;
+
+        // Send the updated data to the server
+        sendUpdatedRowData(updatedRow);
+    }
+
+    function formatDateToYYYYMMDD(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero
+        const day = ('0' + date.getDate()).slice(-2); // Add leading zero
+        return `${year}-${month}-${day}`;
+    }
+
+    function sendRowData(row) {
+        fetch("{% url 'cap_table' company.company_id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(row)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                rows.push(row);
+                appendRow(row);
+                document.getElementById('entryRow').remove();
+            } else {
+                console.error('Error adding row:', data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function sendUpdatedRowData(row) {
+        fetch("{% url 'cap_table' company.company_id %}", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(row)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                renderRows(); // Re-render the table to reflect the changes
+            } else {
+                console.error('Error updating row:', data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function deleteRow(index, rowId) {
+        if (confirm("Are you sure you want to delete this entry?")) {
+            fetch("{% url 'cap_table' company.company_id %}", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id: rowId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Remove the row from the rows array and re-render the table
+                    rows.splice(index, 1);
+                    renderRows();
+                } else {
+                    console.error('Error deleting row:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+    
+
+    function renderRows() {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        rows.forEach((row, index) => {
+            appendRow(row);
+        });
+    }
+
+    function cancelEdit() {
+        renderRows();
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock content %}

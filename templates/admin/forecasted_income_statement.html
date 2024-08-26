@@ -1,0 +1,1042 @@
+{% include 'admin/company_profile.html' %}
+
+{% block styles %}
+<style>
+    .container {
+        padding-left: 280px;
+        max-width: 100%;
+        position: relative;
+        height: calc(100vh - 135px);
+        overflow-y: auto;
+        max-height: 100%;
+    }
+
+    .content {
+        margin: 40px auto;
+        padding-top: 30px;
+        padding-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    table {
+        font-family: 'Times New Roman', Times, serif;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left !important;
+        width: 150px !important;
+    }
+
+    td {
+        text-align: right;
+    }
+
+    th {
+        background-color: #f2f2f2 !important;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .rowview {
+        width: 35%;
+    }
+
+    .rowview1 {
+        width: 10%;
+    }
+
+    .btn-plus {
+        font-size: 24px;
+        color: #007bff;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-plus:hover {
+        color: #0056b3;
+    }
+
+    tr.hidden {
+        display: none;
+    }
+
+    .cell button {
+        font-size: 50%;
+        color: #000;
+        background-color: #fff;
+        padding: 0.3em 0.2em 0 0.2em;
+        border: 0.2em solid #00f;
+        border-radius: 50%;
+        line-height: 1;
+        text-align: center;
+        text-indent: 0;
+        transform: rotate(270deg);
+    }
+
+    .cell button svg {
+        width: 1.25em;
+        height: 1.25em;
+        fill: #00f;
+        transition: transform 0.25s ease-in;
+        transform-origin: center 45%;
+    }
+
+    .cell button[aria-expanded="true"] svg {
+        transform: rotate(90deg);
+    }
+
+    .indent-level-1 td:first-child {
+        padding-left: 2em;
+    }
+
+    .indent-level-2 td:first-child {
+        padding-left: 4em;
+    }
+
+    .indent-level-3 td:first-child {
+        padding-left: 6em;
+    }
+
+    .dropdown-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .inline-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 15px;
+    }
+
+    .inline-container label {
+        width: 85px;
+    }
+
+    .form-select {
+        margin-left: 10px;
+        width: 50%;
+    }
+
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    .modal-content {
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .form-check {
+        margin-right: 15px;
+    }
+
+    .form-check-label {
+        margin-left: 5px;
+    }
+
+    .form-control {
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .btn-primary {
+        font-family: 'Agency FB', Times, serif;
+    }
+    table td,th{
+        text-wrap: nowrap !important;
+    }
+
+     /* Set a fixed width for the input fields */
+.form-control {
+    width: 100px; /* Adjust the width as needed */
+    height:30px;
+    margin: 0; /* Remove any default margins */
+}
+
+/* Center the input fields within the <td> elements */
+td {
+    position: relative; /* Required for absolute positioning */
+}
+
+td input {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
+{% endblock styles %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3">
+            <h6 class="mb-4">
+                Corporate Finance -
+                {% if request.resolver_match.url_name == 'planning_budgeting_income_statement_table' %}
+                Planning & Budgeting
+                {% elif request.resolver_match.url_name == 'forecasting_income_statement_table' %}
+                Forecasting
+                {% endif %}
+                - <b>Income Statement</b>
+            </h6>
+        </div>
+
+        <div class="col-md-3">
+            <form method="get" action="">
+                <div class="m-0 inline">
+                    <label for="pre_selected_income_statement">Past Statements </label>
+                    <select class="form-select " id="pre_selected_income_statement" name="pre_selected_income_statement" required onchange="this.form.submit()">
+                        {% if pre_selected_income_statement_data %}
+                        <option value="{{pre_selected_income_statement_data.monthly_or_quarterly_or_yearly}}">
+                            {{pre_selected_income_statement_data.monthly_or_quarterly_or_yearly}}</option>
+                        {% else %}
+                        <option value="">Select</option>
+                        {% endif %}
+
+                        {% for type in income_statements %}
+                        <option value="{{type.monthly_or_quarterly_or_yearly}}">{{type.monthly_or_quarterly_or_yearly}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- <div class="col-md-3">
+            <form method="get" action="">
+                <div class="m-0 inline">
+                    <label for="pre_selected_income_statement">Past Statements </label>
+                    <select class="form-select " id="pre_selected_income_statement" name="pre_selected_income_statement" required onchange="this.form.submit()">
+                        {% if pre_selected_income_statement_data %}
+                        <option value="{{pre_selected_income_statement_data.monthly_or_quarterly_or_yearly}}">
+                            {{pre_selected_income_statement_data.monthly_or_quarterly_or_yearly}}</option>
+                        {% else %}
+                        <option value="">Select</option>
+                        {% endif %}
+
+                        {% for type in income_statements %}
+                        <option value="{{type.monthly_or_quarterly_or_yearly}}">{{type.monthly_or_quarterly_or_yearly}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div> -->
+        <div class="col-md-3">
+            <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#forecastModal">
+                Forecast
+            </button> -->
+
+            <!-- <div class="modal fade" id="forecastModal" tabindex="-1" role="dialog" aria-labelledby="forecastModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="forecastModalLabel">Forecast</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="#" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="data-type">Forecast Type:</label>
+                                    <div id="data-type" class="d-flex">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="select_type_of_data" id="monthly" value="monthly">
+                                            <label class="form-check-label" for="monthly">Monthly</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="select_type_of_data" id="quarterly" value="quarterly">
+                                            <label class="form-check-label" for="quarterly">Quarterly</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="select_type_of_data" id="yearly" value="yearly">
+                                            <label class="form-check-label" for="yearly">Yearly</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div> -->
+
+            <button type="button" class="btn btn-primary">Save</button>
+
+
+
+        </div>
+    </div>
+
+    {% if pre_selected_income_statement_data %}
+    <div class="table-container mt-1">
+        <div class="table-wrapper">
+            <table class="cell">
+                <thead>
+                    <!-- <tr>
+                        <th class="rowview">Breakdown</th>
+                        <th class="rowview">Pre Selected Data</th>
+                        <th class="rowview">Pre Selected Growth Rate (%)</th>
+                        <th class="rowview">Period+1</th>
+                        <th class="rowview">Period+1 Growth Rate (%)</th>
+                        <th class="rowview">Period+2</th>
+                        <th class="rowview">Period+2 Growth Rate (%)</th>
+                        <th class="rowview">Period+3</th>
+                        <th class="rowview">Period+3 Growth Rate (%)</th>
+                        <th class="rowview">Period+4</th>
+                        <th class="rowview">Period+4 Growth Rate (%)</th>
+                        <th class="rowview">Period+5</th>
+                        <th class="rowview">Period+5 Growth Rate (%)</th>
+                        <th class="rowview">Period+6</th>
+                        <th class="rowview">Period+6 Growth Rate (%)</th>
+                        <th class="rowview">Period+7</th>
+                        <th class="rowview">Period+7 Growth Rate (%)</th>
+                    </tr> -->
+
+                    <thead>
+                        <tr>
+                            <th class="rowview">Breakdown</th>
+                            <th class="rowview">{{ headers.0 }}</th>
+                            <th class="rowview">{{ headers.0 }} Growth Rate (%)</th>
+                            {% for header in headers|slice:"1:" %}
+                            <th class="rowview">{{ header }}</th>
+                            <th class="rowview">{{ header }} Growth Rate (%)</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <button type="button" id="btnMSb" aria-expanded="false" onclick="toggle(this.id,'#MS01b');" aria-controls="MS01b" aria-label="1 more from" aria-labelledby="btnMSb lblMSb">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Total Revenue
+                        </td>
+                        <td class="pre-selected-data">{{ pre_selected_income_statement_data.total_revenue }}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input " name="pre_selected_growth_rate" id="total-revenue-growth-rate"></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input "></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input "></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input "></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input "></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input "></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input "></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input "></td>
+                    </tr>
+                    <tr id="MS01b" class="hidden indent-level-1">
+                        <td>Operating Revenue</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.operating_revenue}}</td>
+                        <td><input  type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Cost of Revenue</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.cost_of_revenue}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="button" id="btnEDENSb" aria-expanded="false" onclick="toggle(this.id,'#EDENS01b');" aria-controls="EDENS01b" aria-label="1 more from" aria-labelledby="btnEDENSb lblEDENSb">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Gross Profit
+                        </td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.gross_profit}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="EDENS01b" class="hidden indent-level-1">
+                        <td>
+                            <button type="button" id="btnOPb" aria-expanded="false" onclick="toggle(this.id,'#SE01,#SE02');" aria-controls="SE01 SE02" aria-label="2 more from" aria-labelledby="btnOPb lblOPb">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Operating Expenses
+                        </td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.operating_expense}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="SE01" class="hidden indent-level-2">
+                        <td>
+                            <button type="button" id="btnGEb" aria-expanded="false" onclick="toggle(this.id,'#GE01,#GE02');" aria-controls="GE01 GE02" aria-label="2 more from" aria-labelledby="btnGEb lblGEb">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Selling, General and Administrative Expense
+                        </td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.selling_general_and_administrative_expense}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="GE01" class="hidden indent-level-3">
+                        <td>General & Administrative Expenses</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.general_and_administrative_expenses}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="GE02" class="hidden indent-level-3">
+                        <td> Selling and Marketing Expense</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.selling_and_marketing_expense}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="SE02" class="hidden indent-level-2">
+                        <td>Research and Development Expense</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.research_and_development_expense}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="button" id="btnOIb" aria-expanded="false" onclick="toggle(this.id,'#NE01,#NE02');" aria-controls="NE01 NE02" aria-label="2 more from" aria-labelledby="btnOIb lblOIb">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Operating Income
+                        </td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.operating_income}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="NE01" class="hidden indent-level-1">
+                        <td>
+                            <button type="button" id="btnNNEIb" aria-expanded="false" onclick="toggle(this.id,'#II01,#II02');" aria-controls="II01 II02" aria-label="2 more from" aria-labelledby="btnNNEIb lblNNEIb">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Net Non Operating Interest Income/ (Expense)
+                        </td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.net_non_operating_interest_income_expense}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="II01" class="hidden indent-level-2">
+                        <td>Interest Income Non Operating</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.interest_income_non_operating}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="II02" class="hidden indent-level-2">
+                        <td>Interest Expense Non Operating</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.interest_expense_non_operating}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="NE02" class="hidden indent-level-1">
+                        <td>
+                            <button type="button" id="btnOIbOther" aria-expanded="false" onclick="toggle(this.id,'#GS01,#SIC02,#WO02,#ON02');" aria-controls="GS01 SIC02 WO02 ON02" aria-label="4 more from" aria-labelledby="btnOIbOther lblOIbOther">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" focusable="false">
+                                    <path d="M70.3 13.8L40 66.3 9.7 13.8z"></path>
+                                </svg>
+                            </button> Other Income/(Expense)
+                        </td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.other_income_or_expense}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="GS01" class="hidden indent-level-2">
+                        <td>Gain/(Loss) on Sale of Security</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.gain_or_loss_on_sale_of_security}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="SIC02" class="hidden indent-level-2">
+                        <td>Special Income/(Charges)</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.special_income_or_charges}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="WO02" class="hidden indent-level-2">
+                        <td>Write Off</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.write_off}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr id="ON02" class="hidden indent-level-2">
+                        <td>Other Non Operating Income/ (Expenses)</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.other_non_operating_income_or_expenses}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Pretax Income</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.pretax_income}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Tax Provision</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.tax_provision}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Net Income</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.net_income}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Preference Share Dividends</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.preference_share_dividends}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Net Income to Common Stockholders</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.net_income_to_common_stockholders}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Equity Share Dividends</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.equity_share_dividends}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>No of Equity Shares</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.no_of_equity_shares}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Retained Earnings</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.retained_earnings}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Basic EPS</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.basic_eps}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Diluted EPS</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.diluted_eps}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>Depreciation and Amortization</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.depreciation_and_amortization}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                    <tr>
+                        <td>EBITDA</td>
+                        <td class="pre-selected-data">{{pre_selected_income_statement_data.ebitda}}</td>
+                        <td><input type="number" class="form-control pre-selected-growth-rate-input "></td>
+                        <td class="period-plus-1-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-1-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-2-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-2-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-3-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-3-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-4-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-4-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-5-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-5-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-6-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-6-growth-rate-input period-growth-rate-input"></td>
+                        <td class="period-plus-7-value period-plus-value"></td>
+                        <td><input type="number" class="form-control period-7-growth-rate-input period-growth-rate-input"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggle(btnID, eIDs) {
+        var theRows = document.querySelectorAll(eIDs);
+        var theButton = document.getElementById(btnID);
+        if (theButton.getAttribute("aria-expanded") == "false") {
+            for (var i = 0; i < theRows.length; i++) {
+                theRows[i].classList.add("shown");
+                theRows[i].classList.remove("hidden");
+            }
+            theButton.setAttribute("aria-expanded", "true");
+        } else {
+            for (var i = 0; i < theRows.length; i++) {
+                theRows[i].classList.add("hidden");
+                theRows[i].classList.remove("shown");
+            }
+            theButton.setAttribute("aria-expanded", "false");
+        }
+    }
+
+    function updatePeriodValues(preSelectedData, growthRates, periodValueElements, startIndex) {
+        let previousValue = parseFloat(preSelectedData);
+        for (let i = 0; i < startIndex; i++) {
+            let growthRate = parseFloat(growthRates[i].value) || 0;
+            previousValue += (previousValue * (growthRate / 100));
+        }
+        for (let i = startIndex; i < periodValueElements.length; i++) {
+            let growthRate = parseFloat(growthRates[i].value) || 0;
+            let newValue = previousValue + (previousValue * (growthRate / 100));
+            periodValueElements[i].textContent = newValue.toFixed(2);
+            previousValue = newValue;
+        }
+    }
+
+    function updateAllGrowthRates(selector, value) {
+        const growthRateInputs = document.querySelectorAll(selector);
+        growthRateInputs.forEach(input => {
+            input.value = value;
+        });
+    }
+
+    function handleGrowthRateInputChange(event, periodIndex) {
+        const value = event.target.value;
+        const periodGrowthRateSelector = `.period-${periodIndex + 1}-growth-rate-input`;
+        updateAllGrowthRates(periodGrowthRateSelector, value);
+
+        const rows = document.querySelectorAll('tr');
+        rows.forEach(row => {
+            const preSelectedDataElement = row.querySelector('.pre-selected-data');
+            const periodValueElements = row.querySelectorAll('.period-plus-value');
+            const growthRateInputs = row.querySelectorAll('.period-growth-rate-input');
+            if (preSelectedDataElement && periodValueElements.length && growthRateInputs.length) {
+                updatePeriodValues(preSelectedDataElement.textContent, growthRateInputs, periodValueElements, periodIndex + 1);
+            }
+        });
+    }
+
+    document.addEventListener('input', function (event) {
+        if (event.target.classList.contains('pre-selected-growth-rate-input')) {
+            const value = event.target.value;
+            updateAllGrowthRates('.pre-selected-growth-rate-input', value);
+            updateAllGrowthRates('.period-1-growth-rate-input', value);
+            updateAllGrowthRates('.period-2-growth-rate-input', value);
+            updateAllGrowthRates('.period-3-growth-rate-input', value);
+            updateAllGrowthRates('.period-4-growth-rate-input', value);
+            updateAllGrowthRates('.period-5-growth-rate-input', value);
+            updateAllGrowthRates('.period-6-growth-rate-input', value);
+            updateAllGrowthRates('.period-7-growth-rate-input', value);
+
+            const rows = document.querySelectorAll('tr');
+            rows.forEach(row => {
+                const preSelectedDataElement = row.querySelector('.pre-selected-data');
+                const periodValueElements = row.querySelectorAll('.period-plus-value');
+                const growthRateInputs = row.querySelectorAll('.period-growth-rate-input');
+                if (preSelectedDataElement && periodValueElements.length && growthRateInputs.length) {
+                    updatePeriodValues(preSelectedDataElement.textContent, growthRateInputs, periodValueElements, 0);
+                }
+            });
+        } else if (event.target.classList.contains('period-growth-rate-input')) {
+            const periodIndex = Array.from(event.target.classList).find(cls => cls.startsWith('period-')).split('-')[1] - 1;
+            handleGrowthRateInputChange(event, periodIndex);
+        }
+    });
+</script>
+
+{% endblock content %}

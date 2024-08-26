@@ -1,0 +1,286 @@
+
+{% extends './base.html' %}
+{% block content %}
+<div class="signup-container">
+    <div class="signup-form">
+        <h1 class="text-center mb-4">Join Our Ecosystem</h1>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for msg in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ msg }}
+            </div>
+            {% endfor %}
+
+            <div class="section personal-info">
+                <h2><i class="fas fa-user"></i> Personal Information</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control form-control-sm" id="username" name="username" placeholder="Username" required>
+                            <label for="username">Username</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email" required>
+                            <label for="email">Email</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="tel" class="form-control form-control-sm" id="phone_number" name="phone_number" placeholder="Phone Number" required>
+                            <label for="phone_number">Phone Number</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="url" class="form-control form-control-sm" id="linkedin_url" name="linkedin_url" placeholder="LinkedIn URL" required>
+                            <label for="linkedin_url">LinkedIn URL</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control form-control-sm" id="firstname" name="firstname" placeholder="First Name" required>
+                            <label for="firstname">First Name</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control form-control-sm" id="lastname" name="lastname" placeholder="Last Name" required>
+                            <label for="lastname">Last Name</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="password" class="form-control form-control-sm" id="password" name="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="password" class="form-control form-control-sm" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                            <label for="confirm_password">Confirm Password</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section company-info">
+                <h2><i class="fas fa-building"></i> Company Details</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control form-control-sm" id="company_name" name="company_name" placeholder="Company Name" required>
+                            <label for="company_name">Company Name</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="email" class="form-control form-control-sm" id="company_email" name="company_email" placeholder="Company Email" required>
+                            <label for="company_email">Company Email</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="url" class="form-control form-control-sm" id="company_website_url" name="company_website_url" placeholder="Website URL" required>
+                            <label for="company_website_url">Website URL</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="url" class="form-control form-control-sm" id="company_linkedin_url" name="company_linkedin_url" placeholder="Company LinkedIn URL" required>
+                            <label for="company_linkedin_url">Company LinkedIn URL</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-floating mb-2">
+                    <select class="form-select form-select-sm" id="company_type" name="company_type" onchange="showCompanyTypeDetails()" required>
+                        <option value="" disabled selected>Select your option</option>
+                        <option value="Startup">Startup</option>
+                        <option value="Investor">Investor</option>
+                        <option value="CA_firm">Enablers</option>
+                    </select>
+                    <label for="company_type">Company Type</label>
+                </div>
+                <div class="mb-2 mt-2" id="company_type_details"></div>
+            </div>
+
+            <div class="section founder-info">
+                <h2><i class="fas fa-user-tie"></i> Founder Details</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control form-control-sm" id="founder_firstname" name="founder_firstname" placeholder="First Name" required>
+                            <label for="founder_firstname">First Name</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control form-control-sm" id="founder_lastname" name="founder_lastname" placeholder="Last Name" required>
+                            <label for="founder_lastname">Last Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="email" class="form-control form-control-sm" id="founder_email" name="founder_email" placeholder="Email" required>
+                            <label for="founder_email">Email</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="url" class="form-control form-control-sm" id="founder_linkedin_url" name="founder_linkedin_url" placeholder="LinkedIn URL" required>
+                            <label for="founder_linkedin_url">LinkedIn URL</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-floating mb-2">
+                    <input type="tel" class="form-control form-control-sm" id="founder_phone_number" name="founder_phone_number" placeholder="Phone Number" required>
+                    <label for="founder_phone_number">Phone Number</label>
+                </div>
+            </div>
+
+            <div class="section subscription-plans">
+                <h2><i class="fas fa-hand-point-down"></i> Choose Your Plan</h2>
+                <div class="plan-options">
+                    <div class="plan-option">
+                        <input type="radio" id="basic" name="plan" value="basic" required>
+                        <label for="basic">
+                            <span class="plan-name">Basic Plan</span>
+                            <span class="plan-price">₹1500<small>/mo</small></span>
+                        </label>
+                    </div>
+                    <div class="plan-option">
+                        <input type="radio" id="standard" name="plan" value="standard" required>
+                        <label for="standard">
+                            <span class="plan-name">Standard Plan</span>
+                            <span class="plan-price">₹12500<small>/mo</small></span>
+                        </label>
+                    </div>
+                    <div class="plan-option">
+                        <input type="radio" id="premium" name="plan" value="premium" required>
+                        <label for="premium">
+                            <span class="plan-name">Premium Plan</span>
+                            <span class="plan-price">₹30000<small>/mo</small></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Roboto', sans-serif;
+    }
+    .signup-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+    }
+    .signup-form {
+        background-color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 800px;
+    }
+    h1 {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+    h2 {
+        color: #34495e;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    h2 i {
+        margin-right: 10px;
+        color: #3498db;
+    }
+    .section {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    .section:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .form-floating > .form-control-sm {
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+        height: calc(2.5rem + 2px);
+    }
+    .form-floating > label {
+        padding: 0.5rem 0.75rem;
+    }
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+    }
+    #company_type_details {
+        background-color: #e8f4fd;
+        padding: 0.5rem;
+        border-radius: 5px;
+        font-style: italic;
+        font-size: 0.9rem;
+    }
+    .plan-options {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .plan-option {
+        flex: 1;
+    }
+    .plan-option input[type="radio"] {
+        display: none;
+    }
+    .plan-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .plan-option input[type="radio"]:checked + label {
+        border-color: #3498db;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+    }
+    .plan-name {
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .plan-price {
+        font-size: 1.1rem;
+        color: #3498db;
+    }
+    .plan-price small {
+        font-size: 0.8rem;
+        color: #7f8c8d;
+    }
+</style>
+
+<script>
+    function showCompanyTypeDetails() {
+        const companyType = document.getElementById('company_type').value;
+        let details = '';
+        if (companyType === 'Startup') {
+            details = 'Startups and MSMEs, sign up, get noticed by investors and get funded.';
+        } else if (companyType === 'Investor') {
+            details = 'Angel investors, VC, PE, Family offices, sign up, discover promising ventures and gains insights to invest.';
+        } else if (companyType === 'CA_firm') {
+            details = 'Professional firms, investment bankers, incubators, mentors, sign up to connect and support innovative startups.';
+        }
+        document.getElementById('company_type_details').innerText = details;
+    }
+</script>
+{% endblock content %}

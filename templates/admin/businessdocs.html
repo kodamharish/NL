@@ -1,0 +1,443 @@
+{% include './company_profile.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .container {
+            position: relative;
+            padding: 30px 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+        }
+
+        .company-name {
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            color: #2c3e50;
+        }
+
+        .divider {
+            border-top: 2px solid #2c3e50;
+            margin: 5px 0;
+            padding-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+            color: #34495e;
+        }
+
+        .card-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        .card-body {
+            padding: 30px;
+            text-align: center;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .add-section-icon {
+            font-size: 2rem;
+            color: #7b7b7b;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 100%;
+            left: 48%;
+        }
+
+        .add-section-icon.moved {
+            top: 20px;
+            right: -80px;
+            left: auto;
+            bottom: auto;
+            transform: none;
+        }
+
+        .add-section-icon:hover {
+            color: #000000;
+            transform: scale(1.2);
+        }
+       
+
+        .plus-icon {
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #7b7b7b;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1;
+            position: absolute;
+            top: 55%;
+            left: 48%;
+        }
+
+        .plus-icon.uploaded {
+            top: 10px;
+            left: auto;
+            right: 10px;
+            transform: none;
+        }
+
+        .plus-icon:hover {
+            color: #000000;
+            transform: scale(1.2);
+        }
+
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .pdf-preview-container {
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 5px;
+        }
+
+        .pdf-thumbnail {
+            border: none;
+            width: 200px;
+            height: 120px;
+            background-color: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .pdf-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pdf-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pdf-info {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .pdf-icon {
+            font-size: 1rem; /* Small icon size */
+            color: #e74c3c;
+            margin-right: 8px;
+        }
+
+        .pdf-name {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #2c3e50;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px; /* Adjust as needed */
+        }
+
+        .pdf-actions {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .pdf-actions .btn {
+            font-size: 0.65rem; /* Smaller text */
+            padding: 2px 6px; /* Smaller padding */
+            text-decoration: none;
+        }
+
+        /* Styles for Excel Card */
+        .excel-card {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f7f7f7;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px; /* Space between cards */
+            text-align: center;
+        }
+
+        .excel-card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .excel-icon {
+            font-size: 4rem; /* Large icon size */
+            color: #2ecc71;
+            margin-bottom: 10px;
+        }
+
+        .excel-name {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px; /* Adjust as needed */
+            overflow: hidden;
+        }
+
+        .remove-btn {
+            font-size: 0.875rem;
+            color: #e74c3c;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .remove-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* Flexbox for file list */
+        .uploaded-excel-files {
+            display: flex;
+            justify-items: inherit;
+            gap: 10px; /* Space between cards */
+            align-items: flex-start; /* Aligns items to the start of the container */
+        }
+        .uploaded-pdf-files {
+            display: flex;
+            justify-items: center;
+            border: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h4 class="company-name">Company</h4>
+        <div class="add-section-icon" id="add-section"><i class="fas fa-plus"></i></div>
+        <section id="sections">
+            
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+    <script>
+        function handlePDFUpload(input, container) {
+            input.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const fileReader = new FileReader();
+
+                    fileReader.onload = function() {
+                        const typedArray = new Uint8Array(this.result);
+                        pdfjsLib.getDocument(typedArray).promise.then(pdf => {
+                            pdf.getPage(1).then(page => {
+                                const scale = 1.0;
+                                const viewport = page.getViewport({ scale: scale });
+
+                                const canvas = document.createElement('canvas');
+                                const context = canvas.getContext('2d');
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+
+                                page.render({
+                                    canvasContext: context,
+                                    viewport: viewport
+                                }).promise.then(function() {
+                                    const pdfPreview = `
+                                        <div class="card pdf-card">
+                                            <div class="pdf-card d-flex flex-column align-items-center">
+                                                <div class="pdf-preview-container">
+                                                    <div class="pdf-thumbnail">
+                                                        <img src="${canvas.toDataURL()}" alt="PDF Thumbnail">
+                                                    </div>
+                                                    <div class="pdf-info ml-2">
+                                                        <i class="fas fa-file-pdf pdf-icon"></i>
+                                                        <div class="pdf-name">${file.name}</div>
+                                                    </div>
+                                                    <div class="pdf-actions mt-1">
+                                                        <button class="btn btn-sm btn-outline-primary" onclick="window.open('${URL.createObjectURL(file)}', '_blank')">Open</button>
+                                                        <button class="btn btn-sm btn-outline-danger" onclick="removePDF(container, '${file.name}')">Remove</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    container.innerHTML = pdfPreview;
+                                    input.parentElement.classList.add('uploaded');
+                                });
+                            });
+                        });
+                    };
+
+                    fileReader.readAsArrayBuffer(file);
+                }
+            });
+        }
+
+        function handleExcelUpload(input, container) {
+            input.addEventListener('change', function(event) {
+                const files = event.target.files;
+                const fileList = Array.from(files);
+
+                fileList.forEach(file => {
+                    const existingFiles = Array.from(container.querySelectorAll('.excel-name')).map(elem => elem.textContent);
+                    
+                    if (!existingFiles.includes(file.name)) {
+                        const excelPreview = `
+                            <div class="excel-card">
+                                <div class="excel-card-body">
+                                    <i class="fas fa-file-excel excel-icon"></i>
+                                    <div class="excel-name">${file.name}</div>
+                                    <div class="remove-btn" onclick="removeExcel('${file.name}')">Remove</div>
+                                </div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', excelPreview);
+                    }
+                });
+
+                if (container.children.length > 0) {
+                    input.parentElement.classList.add('uploaded');
+                }
+            });
+        }
+
+        function addSection() {
+            const sections = document.getElementById('sections');
+
+            const newSectionIndex = document.querySelectorAll('.section').length + 1;
+
+            const newSection = document.createElement('div');
+            newSection.classList.add('section');
+            newSection.innerHTML = `
+                <h6 class="section-title">Manartha Solutions</h6>
+                <hr class="divider">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card card-wrapper">
+                            <div class="card-header">
+                                <p>Business Plan <br> <small>&lt;&lt; Upload the PDF format &gt;&gt;</small></p>
+                            </div>
+                            <div class="card-body">
+                                <div class="plus-icon" id="pdf-plus-icon-${newSectionIndex}">
+                                    <i class="fas fa-plus"></i>
+                                    <input type="file" accept=".pdf" class="file-input pdf-upload">
+                                </div>
+                                <div class="uploaded-pdf-files"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card card-wrapper">
+                            <div class="card-header">
+                                <p>Financial Statements <br> <small>&lt;&lt; List all the statements user has uploaded &gt;&gt;</small></p>
+                            </div>
+                            <div class="card-body">
+                                <div class="plus-icon" id="excel-plus-icon-${newSectionIndex}">
+                                    <i class="fas fa-plus"></i>
+                                    <input type="file" accept=".xls, .xlsx" class="file-input excel-upload" multiple>
+                                </div>
+                                <div class="uploaded-excel-files"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            sections.insertBefore(newSection, sections.firstChild);
+            const addSectionButton = document.getElementById('add-section');
+                addSectionButton.classList.add('moved');
+            // Attach file upload handlers to new sections
+            const fileInputs = newSection.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                if (input.classList.contains('pdf-upload')) {
+                    handlePDFUpload(input, input.parentElement.nextElementSibling);
+                } else if (input.classList.contains('excel-upload')) {
+                    handleExcelUpload(input, input.parentElement.nextElementSibling);
+                }
+            });
+        }
+
+        function initializeFileInputs() {
+            document.querySelectorAll('input.pdf-upload').forEach(input => {
+                handlePDFUpload(input, input.parentElement.nextElementSibling);
+            });
+
+            document.querySelectorAll('input.excel-upload').forEach(input => {
+                handleExcelUpload(input, input.parentElement.nextElementSibling);
+            });
+        }
+
+        function removePDF(container, fileName) {
+            container.querySelectorAll('.pdf-name').forEach(pdf => {
+                if (pdf.textContent === fileName) {
+                    pdf.parentElement.parentElement.remove(); // Remove the PDF preview
+                }
+            });
+        }
+
+        function removeExcel(fileName) {
+            document.querySelectorAll('.uploaded-excel-files .excel-name').forEach(excel => {
+                if (excel.textContent === fileName) {
+                    excel.parentElement.parentElement.remove(); // Remove the Excel preview
+                }
+            });
+        }
+
+        document.getElementById('add-section').addEventListener('click', addSection);
+
+        // Initialize file inputs for existing sections
+        initializeFileInputs();
+    </script>
+</body>
+</html>
+{% endblock content %}

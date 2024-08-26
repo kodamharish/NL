@@ -1,0 +1,96 @@
+{% load static %}
+{% block content %}
+<style>
+    .main-content {
+        margin-left: 290px;
+        /* Adjust according to sidebar width */
+        padding: 40px;
+        /* Reduce padding for a cleaner look */
+        transition: margin-left 0.3s;
+        /* Smooth transition for sidebar width changes */
+    }
+</style>
+{% include './company_profile.html' %}
+
+<div class="main-content">
+    <div class="container mt-5">
+        
+        <div class="row">
+            <div class="col-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addBusinessPlan">
+                    Add Business Plan
+                </button>
+                <!-- The Modal -->
+                <div class="modal" id="addBusinessPlan">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h4 class="modal-title">Business Plan</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <!-- Modal body -->
+                            <div class="modal-body text-center">
+                                <form method="POST" action="#" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="mb-3 mt-3 inline">
+                                        <label for="business_plan">Business Plan</label>
+                                        <input type="file" class="w-50" name="business_plan" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#updateBusinessPlan">
+                    Update Business Plan
+                </button>
+                <!-- The Modal -->
+                <div class="modal" id="updateBusinessPlan">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h4 class="modal-title">Update Business Plan</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <!-- Modal body -->
+                            <div class="modal-body text-center">
+                                <form method="POST" action="#" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="mb-3 mt-3 inline">
+                                        <label for="new_business_plan">New Business Plan</label>
+                                        <input type="file" class="w-50" name="new_business_plan" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+
+        {% if company_profile.business_plan %}
+        <div class="row mt-4 text-center">
+            <div class="col-md-12">
+                <embed src="{% static company_profile.business_plan.url %}"  width="800px"  height="550px"   type="application/pdf">
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,661 @@
+{% include 'admin/company_profile.html' %}
+
+{% block styles %}
+<style>
+    :root {
+        --row-height: 20px !important;
+        --font-size: 14px;
+        --first-column-width: 350px;
+        --indentation: 20px;
+        --double-indentation: 40px;
+        --triple-indentation: 60px;
+        --quad-indentation: 80px;
+        --column-width: 60px !important;
+    }
+
+    body {
+        font-family: 'Arial MT Rounded', Arial, sans-serif;
+        font-size: var(--font-size);
+        color: black;
+    }
+
+    .container {
+        margin-left: 250px;
+        max-width: 100%;
+        position: relative;
+        height: calc(100vh - 135px);
+        overflow-y: auto;
+        max-height: 100%;
+    }
+
+    .content {
+        margin: 40px auto;
+        padding-top: 30px;
+        padding-left: 200px;
+    }
+
+    .table-wrapper {
+        position: relative;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 75%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: var(--font-size);
+        /* coloumn-width:var(--column-width) !important; */
+    }
+
+    th, td {
+        vertical-align: middle;
+        text-align: right; 
+        padding: 12px;
+        height: var(--row-height);
+        font-size: var(--font-size);
+        line-height: 1.2;
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+       
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        text-align: center !important;
+    }
+
+    td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: white;
+        z-index: 3;
+        width: 200px !important;
+        text-align: left;
+    }
+    .td{
+        text-align: right !important;
+    }
+
+
+    .table tbody tr:hover {
+        background-color: #f0f0f0;
+    }
+
+    .indent-level-1 td:first-child {
+        padding-left: var(--indentation) !important;
+    }
+
+    .indent-level-2 td:first-child {
+        padding-left: var(--double-indentation) !important;
+    }
+
+    .indent-level-3 td:first-child {
+        padding-left: var(--triple-indentation) !important;
+    }
+
+    .indent-level-4 td:first-child {
+        padding-left: var(--quad-indentation) !important;
+    }
+
+    .expandable-icon {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .expandable-icon::before {
+        content: "\25B6";
+        display: inline-block;
+        transform: rotate(90deg);
+    }
+
+    .collapse.show .expandable-icon::before {
+        content: "\25BC";
+        transform: rotate(0deg);
+    }
+
+    .btn-plus {
+        font-size: 24px;
+        color: #007bff;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-plus:hover {
+        color: #0056b3;
+    }
+
+    tr.hidden {
+        display: none;
+    }
+
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    /* Remove vertical lines inside the table */
+    table, th, td {
+        border-left: none;
+        border-right: none;
+    }
+</style>
+{% endblock styles %}
+
+{% block content %}
+<div class="container mt-5">
+    {% for msg in messages %}
+    <p class="text-danger text-center mt-2 fw-bold" style="font-size: 1rem;">{{ msg }}</p>
+    {% endfor %}
+    <div class="row">
+        <div class="col-md-4">
+            <h6 class="mb-4">
+                Corporate Finance -
+                {% if request.resolver_match.url_name == 'planning_budgeting_balance_sheet_table' %}
+                Planning & Budgeting
+                {% elif request.resolver_match.url_name == 'forecasting_balance_sheet_table' %}
+                Forecasting
+                {% endif %}
+                - <b>Balance Sheet</b>
+            </h6>
+        </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <a href="#" class="btn-plus" data-bs-toggle="modal" data-bs-target="#balance_sheet">+</a>
+            <!-- The Modal -->
+            <div class="modal" id="balance_sheet">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title"></h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="modal-body text-center">
+                            <form method="POST" action="#" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="inline">
+                                    <div style="margin-right:15px;">
+                                        <input type="radio" class="form-check-input" id="monthly"
+                                            name="select_type_of_data" value="monthly">
+                                        <label class="form-check-label" for="monthly">Monthly</label>
+                                    </div>
+                                    <div style="margin-right:15px;">
+                                        <input type="radio" class="form-check-input" id="quarterly"
+                                            name="select_type_of_data" value="quarterly">
+                                        <label class="form-check-label" for="quarterly">Quarterly</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" class="form-check-input" id="yearly"
+                                            name="select_type_of_data" value="yearly">
+                                        <label class="form-check-label" for="yearly">Yearly</label>
+                                    </div>
+                                </div>
+                                <div id="dropdown-container" class="mt-3"></div>
+                                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                            </form>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-container mt-1">
+        <div class="table-wrapper">
+            <table class="cell">
+                <thead>
+                    <tr>
+                        <th class="rowview">Breakdown</th>
+                        {% for balance_sheet in balance_sheets %}
+                        <th class="rowview1">{{balance_sheet.date|date:'d-m-Y'}}
+                            ({{balance_sheet.monthly_or_quarterly_or_yearly}})</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Total Assets Section -->
+                    <tr>
+                        <td>Total Assets <span class="expandable-icon" onclick="toggle(this, '#MS01a');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.total_assets}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01a" class="hidden indent-level-1">
+                        <td>Current Assets <span class="expandable-icon" onclick="toggle(this, '#MS01b');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.current_assets}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01b" class="hidden indent-level-2">
+                        <td>Cash, Cash Equivalents & Short Term Investments <span class="expandable-icon"
+                                onclick="toggle(this, '#MS01c');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.cash_cash_equivalents_and_short_term_investments}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01c" class="hidden indent-level-3">
+                        <td>Cash And Cash Equivalents <span class="expandable-icon" onclick="toggle(this, '#MS01d');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.cash_and_cash_equivalents}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01d" class="hidden indent-level-4">
+                        <td>Cash</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.cash}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01d" class="hidden indent-level-4">
+                        <td>Cash Equivalents</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.cash_equivalents}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01c" class="hidden indent-level-3">
+                        <td>Other Short Term Investments</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.other_short_term_investments}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Receivables -->
+                    <tr id="MS01b" class="hidden indent-level-2">
+                        <td>Receivables <span class="expandable-icon" onclick="toggle(this, '#MS01e');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.receivables}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01e" class="hidden indent-level-3">
+                        <td>Accounts Receivable <span class="expandable-icon" onclick="toggle(this, '#MS01f');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.accounts_receivable}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01f" class="hidden indent-level-4">
+                        <td>Gross Accounts Receivable</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.gross_accounts_receivable}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01f" class="hidden indent-level-4">
+                        <td>Allowance For Doubtful Accounts Receivable</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.allowance_for_doubtful_accounts_receivable}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01e" class="hidden indent-level-3">
+                        <td>Other Receivables</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.other_receivables}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Inventory -->
+                    <tr id="MS01b" class="hidden indent-level-2">
+                        <td>Inventory <span class="expandable-icon" onclick="toggle(this, '#MS01g');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.inventory}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01g" class="hidden indent-level-3">
+                        <td>Raw Materials</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.raw_materials}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01g" class="hidden indent-level-3">
+                        <td>Work In Process</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.work_in_process}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="MS01g" class="hidden indent-level-3">
+                        <td>Finished Goods</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.finished_goods}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Hedging Assets Current -->
+                    <tr id="MS01b" class="hidden indent-level-2">
+                        <td>Hedging Assets Current</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.hedging_assets_current}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Other Current Assets -->
+                    <tr id="MS01b" class="hidden indent-level-2">
+                        <td>Other Current Assets</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.other_current_assets}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Total Liabilities Net Minority Interest -->
+                    <tr>
+                        <td>Total Liabilities Net Minority Interest <span class="expandable-icon" onclick="toggle(this, '#LI01a');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.total_liabilities_net_minority_interest}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01a" class="hidden indent-level-1">
+                        <td>Current Liabilities <span class="expandable-icon" onclick="toggle(this, '#LI01b');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.current_liabilities}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01b" class="hidden indent-level-2">
+                        <td>Payables And Accrued Expenses <span class="expandable-icon" onclick="toggle(this, '#LI01c');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.payables_and_accrued_expenses}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01c" class="hidden indent-level-3">
+                        <td>Accounts Payable</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.accounts_payable}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01c" class="hidden indent-level-3">
+                        <td>Income Tax Payable</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.income_tax_payable}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Pension & Other Post Retirement Benefit Plans Current -->
+                    <tr id="LI01b" class="hidden indent-level-2">
+                        <td>Pension & Other Post Retirement Benefit Plans Current</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.pension_other_post_retirement_plans_current}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Current Debt And Capital Lease Obligation -->
+                    <tr id="LI01b" class="hidden indent-level-2">
+                        <td>Current Debt And Capital Lease Obligation <span class="expandable-icon" onclick="toggle(this, '#LI01d');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.current_debt_and_capital_lease_obligation}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01d" class="hidden indent-level-3">
+                        <td>Current Debt</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.current_debt}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01d" class="hidden indent-level-3">
+                        <td>Capital Lease Obligation</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.capital_lease_obligation}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Current Deferred Liabilities -->
+                    <tr id="LI01b" class="hidden indent-level-2">
+                        <td>Current Deferred Liabilities <span class="expandable-icon" onclick="toggle(this, '#LI01e');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.current_deferred_liabilities}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI01e" class="hidden indent-level-3">
+                        <td>Current Deferred Revenue</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.current_deferred_revenue}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Other Current Liabilities -->
+                    <tr id="LI01b" class="hidden indent-level-2">
+                        <td>Other Current Liabilities</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.other_current_liabilities}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Total Non-Current Liabilities Net Minority Interest -->
+                    <tr id="LI01a" class="hidden indent-level-1">
+                        <td>Total Non-Current Liabilities Net Minority Interest <span class="expandable-icon" onclick="toggle(this, '#LI02a');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.total_non_current_liabilities_net_minority_interest}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI02a" class="hidden indent-level-2">
+                        <td>Long Term Debt And Capital Lease Obligation <span class="expandable-icon" onclick="toggle(this, '#LI02b');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.long_term_debt_and_capital_lease_obligation}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI02b" class="hidden indent-level-3">
+                        <td>Long Term Debt</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.long_term_debt}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI02b" class="hidden indent-level-3">
+                        <td>Long Term Capital Lease Obligation</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.long_term_capital_lease_obligation}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Non-Current Deferred Liabilities -->
+                    <tr id="LI02a" class="hidden indent-level-2">
+                        <td>Non-Current Deferred Liabilities <span class="expandable-icon" onclick="toggle(this, '#LI02c');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.non_current_deferred_liabilities}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI02c" class="hidden indent-level-3">
+                        <td>Non-Current Deferred Taxes Liabilities</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.non_current_deferred_taxes_liabilities}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="LI02c" class="hidden indent-level-3">
+                        <td>Non-Current Deferred Revenue</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.non_current_deferred_revenue}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Trade and Other Payables Non-Current -->
+                    <tr id="LI02a" class="hidden indent-level-2">
+                        <td>Trade and Other Payables Non-Current</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.trade_and_other_payables_non_current}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Other Non-Current Liabilities -->
+                    <tr id="LI02a" class="hidden indent-level-2">
+                        <td>Other Non-Current Liabilities</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.other_non_current_liabilities}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Total Equity Gross Minority Interest -->
+                    <tr>
+                        <td>Total Equity Gross Minority Interest <span class="expandable-icon" onclick="toggle(this, '#EQ01a');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.total_equity_gross_minority_interest}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="EQ01a" class="hidden indent-level-1">
+                        <td>Stockholders' Equity <span class="expandable-icon" onclick="toggle(this, '#EQ01b');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.stockholders_equity}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="EQ01b" class="hidden indent-level-2">
+                        <td>Capital Stock <span class="expandable-icon" onclick="toggle(this, '#EQ01c');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.capital_stock}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="EQ01c" class="hidden indent-level-3">
+                        <td>Common Stock</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.common_stock}}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Retained Earnings -->
+                    <tr id="EQ01b" class="hidden indent-level-2">
+                        <td>Retained Earnings <span class="expandable-icon" onclick="toggle(this, '#EQ01d');"></span></td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.retained_earnings}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="EQ01d" class="hidden indent-level-3">
+                        <td>Gains/(Losses) Not Affecting Retained Earnings</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.gains_losses_not_affecting_retained_earnings}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr id="EQ01d" class="hidden indent-level-3">
+                        <td>Other Equity Adjustments</td>
+                        {% for balance_sheet in balance_sheets %}
+                        <td>{{balance_sheet.other_equity_adjustments}}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggle(button, targetId) {
+        var targetRows = document.querySelectorAll(targetId);
+        var isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        button.setAttribute('aria-expanded', !isExpanded);
+        targetRows.forEach(row => {
+            if (isExpanded) {
+                row.classList.add('hidden');
+            } else {
+                row.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Collapse all by default when the page is loaded
+    window.onload = function() {
+        document.querySelectorAll('.expandable-icon').forEach(icon => {
+            icon.setAttribute('aria-expanded', 'false');
+            var targetId = icon.getAttribute('onclick').split("'")[1];
+            document.querySelectorAll(targetId).forEach(row => row.classList.add('hidden'));
+        });
+    }
+     // Embed the Python-generated JSON data into JavaScript variables
+     const months = JSON.parse('{{ months_json|escapejs }}');
+    const quarters = JSON.parse('{{ quarters_json|escapejs }}');
+    const years = JSON.parse('{{ years_json|escapejs }}');
+
+    // JavaScript to handle dropdown options based on selected radio button
+    const radioButtons = document.querySelectorAll('input[name="select_type_of_data"]');
+    const dropdownContainer = document.getElementById('dropdown-container');
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', function () {
+            dropdownContainer.innerHTML = ''; // Clear the container
+
+            if (this.value === 'yearly') {
+                // Create Year Dropdown
+                const yearWrapper = document.createElement('div');
+                yearWrapper.classList.add('inline-container');
+
+                const yearLabel = document.createElement('label');
+                yearLabel.setAttribute('for', 'year-select');
+                yearLabel.textContent = 'Select Year:';
+
+                const yearSelect = document.createElement('select');
+                yearSelect.name = 'year';
+                yearSelect.id = 'year-select';
+                yearSelect.classList.add('form-select');
+                createOptions(years, yearSelect);
+
+                yearWrapper.appendChild(yearLabel); // Add the year label to the wrapper
+                yearWrapper.appendChild(yearSelect); // Add the year dropdown to the wrapper
+                dropdownContainer.appendChild(yearWrapper); // Add the year wrapper to the container
+
+            } else {
+                // Create Year Dropdown
+                const yearWrapper = document.createElement('div');
+                yearWrapper.classList.add('inline-container');
+
+                const yearLabel = document.createElement('label');
+                yearLabel.setAttribute('for', 'year-select');
+                yearLabel.textContent = 'Select Year:';
+
+                const yearSelect = document.createElement('select');
+                yearSelect.name = 'year';
+                yearSelect.id = 'year-select';
+                yearSelect.classList.add('form-select');
+                createOptions(years, yearSelect);
+
+                yearWrapper.appendChild(yearLabel); // Add the year label to the wrapper
+                yearWrapper.appendChild(yearSelect); // Add the year dropdown to the wrapper
+                dropdownContainer.appendChild(yearWrapper); // Add the year wrapper to the container
+
+                // Create Month/Quarter Dropdown
+                const mainWrapper = document.createElement('div');
+                mainWrapper.classList.add('inline-container');
+
+                const mainLabel = document.createElement('label');
+                mainLabel.setAttribute('for', 'main-select');
+
+                const mainSelect = document.createElement('select');
+
+                mainSelect.id = 'main-select';
+                mainSelect.classList.add('form-select');
+
+                if (this.value === 'monthly') {
+                    mainLabel.textContent = 'Select Month:';
+                    mainSelect.name = 'month';
+                    createOptions(months, mainSelect);
+                } else if (this.value === 'quarterly') {
+                    // Convert quarters object to an array of strings in the format "Q1 Jan,Feb,Mar"
+                    const quartersArray = Object.entries(quarters).map(([key, value]) => `${key} ${value}`);
+                    mainLabel.textContent = 'Select Quarter:';
+                    mainSelect.name = 'quarter';
+
+                    createOptions(quartersArray, mainSelect);
+                }
+
+                mainWrapper.appendChild(mainLabel); // Add the main label to the wrapper
+                mainWrapper.appendChild(mainSelect); // Add the main dropdown to the wrapper
+                dropdownContainer.appendChild(mainWrapper); // Add the main wrapper to the container
+            }
+        });
+    });
+
+    function createOptions(options, selectElement) {
+        options.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option;
+            opt.textContent = option;
+            selectElement.appendChild(opt);
+        });
+    }
+
+
+
+
+</script>
+{% endblock content %}

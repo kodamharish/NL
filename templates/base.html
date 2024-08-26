@@ -1,0 +1,408 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Number Leader</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}">
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/styles.css'%}" rel="stylesheet">
+  <link href="{% static 'css/super_admin.css'%}" rel="stylesheet">
+  <!-- <link href="{% static 'css/contact.css'%}" rel="stylesheet"> -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+  <!-- Add the following CDN links for jQuery and DataTables -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+  <script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+  {% block styles %}
+
+  {% endblock styles %}
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-sm shadow">
+    <div class="container-fluid">
+      <a class="navbar-brand"><img src="{% static 'images/logo.png'%}" style="margin-left:20px;"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+          {% if not current_user and not current_subuser %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about'%}">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'services' %}">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Sign In</a>
+          </li>
+          {% endif %}
+
+
+          {% if current_user or current_subuser %}
+
+          <!-- Super Admin -->
+
+          {% if current_user.user_type == 'super_admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'super_admin_dashboard' %}">Dashboard</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="{% url 'admins' %}">Admins</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'editors' %}">Editors</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'users' %}">Users</a>
+          </li> -->
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'super_admin_dashboard' %}">Company</a>
+          </li>
+          {% endif %}
+
+          <!-- Super Admin -->
+
+
+          <!-- Admin -->
+          {% if current_user.user_type == 'admin' %}
+          
+
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_dashboard'  %}" id="adminDashboardLink">Dashboard</a>
+          </li>
+
+          
+
+
+          
+
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="myCompanyDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              My Company
+            </a>
+
+
+            <ul class="dropdown-menu" aria-labelledby="myCompanyDropdown">
+              {% if current_user_companies %}
+              {% for company in current_user_companies %}
+              <li>
+                <a class="dropdown-item company-select" href="#" data-company-id="{{ company.company_id }}"
+                  data-company-name="{{ company.name }}">
+                  {{ company.name }}
+                  {% if current_user_company_profiles%}
+                
+                  {% endif %}
+                </a>
+              </li>
+              {% endfor %}
+              {% endif %}
+              <li><a class="dropdown-item" href="{% url 'add_company' %}">Add</a></li>
+            </ul>
+          </li>
+
+          {% if current_user.company_type == 'startup' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'investor_dashboard' %}" >Investor</a>
+          </li>
+
+          <!-- <li class="nav-item">
+            {% if not current_user_company_profiles %}
+                <a class="nav-link disabled" href="#" aria-disabled="true">Investor</a>
+            {% else %}
+                <a class="nav-link" href="{% url 'investor_dashboard' %}">Investor</a>
+            {% endif %}
+          </li> -->
+
+
+        <!-- ca firm -->
+          <li class="nav-item">
+            <a class="nav-link" href="#"> Enablers</a> 
+          </li>
+
+          <!-- <li class="nav-item">
+            {% if not current_user_company_profiles %}
+                <a class="nav-link disabled" href="#" aria-disabled="true">Enabler</a>
+            {% else %}
+                <a class="nav-link" href="#">Enabler</a>
+            {% endif %}
+          </li> -->
+
+
+          {% endif %}
+
+          {% if current_user.company_type == 'investor' %}
+          <li class="nav-item">
+            <a class="nav-link" href="#">Startup</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"> Enablers</a> <!-- ca firm -->
+          </li>
+          {% endif %}
+
+          {% if current_user.company_type == 'enabler' %}
+          <li class="nav-item">
+            <a class="nav-link" href="#">Startup</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Investor</a> <!-- ca firm -->
+          </li>
+          {% endif %}
+          <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">My Team</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Originator</a></li>
+              <li><a class="dropdown-item" href="{% url 'my_team' %}">Associates</a></li>
+
+            </ul>
+          </li> -->
+
+
+          {% endif %}
+          <!-- Admin -->
+
+
+          <!-- Editor -->
+
+          {% if current_subuser.user_type == 'editor' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'editor_dashboard' %}">Editor</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="myCompanyDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              My Company
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="myCompanyDropdown">
+              {% if current_user_companies %}
+              {% for company in current_user_companies %}
+              <li><a class="dropdown-item company-select" href="#" data-company-id="{{ company.company_id }}"
+                  data-company-name="{{ company.name }}">{{ company.name }}</a></li>
+              {% endfor %}
+              {% endif %}
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Investor</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Enablers</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">My Team</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'parent' %}">Originator</a></li>
+              <li><a class="dropdown-item" href="{% url 'my_team' %}">Associates</a></li>
+
+            </ul>
+          </li>
+          {% endif %}
+
+          <!-- Editor -->
+
+          <!-- User -->
+          {% if current_subuser.user_type == 'user' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'user_dashboard'%}">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">User</a>
+          </li>
+
+          <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">My Team</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'parent' %}">Originator</a></li>
+              <li><a class="dropdown-item" href="{% url 'my_team' %}">Associates</a></li>
+            </ul>
+          </li> -->
+
+          {% endif %}
+
+          <!-- User -->
+
+          <!-- <li class="nav-item">
+            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
+          </li> -->
+        </ul>
+      </div>
+
+      <!-- <div style="margin:0px 15px;display:inline-flex">
+        <a class="navbar-brand" href="#">
+          <img src="{% static 'images/img_avatar.png' %}" alt="logo" style="width:40px;" class="rounded-pill">
+        </a>
+        <p class="text-success">
+          <b>{% if current_user %}
+            {{ current_user.username}}
+            ({{current_user.user_type}})
+            {% endif %}
+            {% if current_subuser %}
+            {{ current_subuser.username}}
+            ({{current_subuser.user_type}})
+            {% endif %}
+          </b> <br>
+          <b>{% if current_user %}
+            
+            {{current_user.company_type}}
+            {% endif %}
+            {% if current_subuser %}
+            
+            {{current_user.company_type}}
+            {% endif %}
+          </b> <br>
+
+          
+
+        </p>
+      </div> -->
+
+
+
+      {% if current_user or current_subuser %}
+      <div class="user-info">
+        <img src="{% static 'images/img_avatar.png' %}" alt="User Avatar" class="user-avatar">
+        <div class="user-dropdown">
+          <div class="user-details">
+            <p>
+              {% if current_user %}
+              {{ current_user.username }} ({{ current_user.user_type }})
+              {% elif current_subuser %}
+              {{ current_subuser.username }} ({{ current_subuser.user_type }})
+              {% endif %}
+            </p>
+            <p>
+              {% if current_user %}
+              {{ current_user.company_type|title}}
+              {% elif current_subuser %}
+              {{ current_user.company_type }}
+              {% endif %}
+            </p>
+          </div>
+          <div class="user-actions">
+            <a href="{% url 'my_team' %}" class="user-action-link">
+              <i class="fas fa-users"></i> My Team
+            </a>
+            <a href="{% url 'logout' %}" class="user-action-link logout-link">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+  </nav>
+
+  {% block content %}
+  {% endblock content %}
+
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+  <!-- <script>
+    $(document).ready(function () {
+      var selectedCompanyName = localStorage.getItem('selectedCompanyName');
+      if (selectedCompanyName) {
+        $('#myCompanyDropdown').text('My Company: ' + selectedCompanyName);
+      } else {
+        $('#myCompanyDropdown').text('My Company');
+      }
+
+      $('.dropdown-menu a.company-select').click(function (e) {
+        e.preventDefault();
+        var selectedCompanyName = $(this).data('company-name');
+        var selectedCompanyId = $(this).data('company-id');
+        localStorage.setItem('selectedCompanyName', selectedCompanyName);
+        localStorage.setItem('selectedCompanyId', selectedCompanyId);
+
+        $('#myCompanyDropdown').text('My Company: ' + selectedCompanyName);
+        window.location.href = '/company_profile/' + selectedCompanyId + '/';
+      });
+      $('.logout-link').click(function (e) {
+        localStorage.clear();
+      });
+    });
+  </script>
+
+  <script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    var selectedCompanyName = localStorage.getItem('selectedCompanyName');
+    </script> -->
+
+
+
+    <script>
+      $(document).ready(function () {
+        var selectedCompanyName = localStorage.getItem('selectedCompanyName');
+        if (selectedCompanyName) {
+          $('#myCompanyDropdown').text('My Company: ' + selectedCompanyName);
+        } else {
+          $('#myCompanyDropdown').text('My Company');
+        }
+    
+        $('.dropdown-menu a.company-select').click(function (e) {
+          e.preventDefault();
+          var selectedCompanyName = $(this).data('company-name');
+          var selectedCompanyId = $(this).data('company-id');
+          localStorage.setItem('selectedCompanyName', selectedCompanyName);
+          localStorage.setItem('selectedCompanyId', selectedCompanyId);
+    
+          $('#myCompanyDropdown').text('My Company: ' + selectedCompanyName);
+          window.location.href = '/company_profile/' + selectedCompanyId + '/';
+        });
+    
+        $('.logout-link').click(function (e) {
+          localStorage.clear();
+        });
+    
+        /* var selectedCompanyId = localStorage.getItem('selectedCompanyId');
+        var firstCompanyId = '{{ first_company_id }}';
+        var adminDashboardLink = document.getElementById('adminDashboardLink');
+        
+        if (selectedCompanyId) {
+          adminDashboardLink.href = '/admin_dashboard/' + selectedCompanyId + '/';
+        } else {
+          adminDashboardLink.href = '/admin_dashboard/' + firstCompanyId + '/';
+        } 
+          */
+      });
+    
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+    
+      var selectedCompanyName = localStorage.getItem('selectedCompanyName');
+    </script>
+    
+
+</body>
+
+</html>

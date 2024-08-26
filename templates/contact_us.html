@@ -1,0 +1,168 @@
+{% extends './base.html' %}
+{% block content %}
+        <div class="main_1">
+                <div class="main_heading">
+                        <p>contact us</p>
+                        <h1>Get In Touch , Reach Out </h1>
+                </div>
+                <div class="main_2">
+                        <div class="sub_main_1">
+                                <div class="child_1">
+                                        <p> Phone</p>
+                                        <h2>+1234567890</h2>
+                                        <h2 class="call_us">Call Us</h2>
+
+                                </div>
+                                <div class="child_2">
+                                        <p>E-mail</p>
+                                        <h2>info@numberleader.com
+                                        </h2>
+                                        <h2 class="m_us">Message Us</h2>
+
+                                </div>
+                                <div class="child_3">
+                                        <p>Office Hours</p>
+                                        <h2>8am - 7pm</h2>
+
+                                </div>
+
+                        </div>
+
+                        <div class="sub_main_2">
+                                <form class="contact-form">
+                                        <label for="name">Name</label>
+                                        <input type="text" placeholder="enter your full name..." id="name" name="name"
+                                                required>
+
+                                        <label for="email">Email</label>
+                                        <input type="email" placeholder="enter your email..." id="email" name="email"
+                                                required>
+
+                                        <label for="phone">Phone</label>
+                                        <input type="tel" placeholder="enter your phone..." id="phone" name="phone"
+                                                required>
+
+                                        <label for="message">Message</label>
+                                        <textarea id="message" placeholder="enter your message..." name="message"
+                                                rows="4" required></textarea>
+
+                                        <button type="submit">Submit</button>
+                                </form>
+
+                        </div>
+                </div>
+
+                <div class="container">
+                        <div class="map">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d19809.042929470404!2d-0.14388664275925988!3d51.503324340478456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487604c6302c5aab%3A0x70e2f5f4d42b0b4!2sLondon%20Eye!5e0!3m2!1sen!2suk!4v1688148029586!5m2!1sen!2suk"
+                                        width="870" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                        </div>
+                        <div class="info">
+                                <h2>Our Headquarters</h2>
+                                <h3>Find Us Here</h3>
+                                <p>Discover our convenient location and easily locate us on the map. Whether you’re
+                                        seeking assistance with a project or simply want to drop by, finding us has
+                                        never been easier. Explore our address and get directions to our office
+                                        effortlessly.</p>
+                        </div>
+                </div>
+
+                <div>
+                        <h4>FAQ</h4>
+
+                </div>
+                <div class="faq_main">
+
+
+                        <div class="faq-container">
+                                <h1>Everything You Need to Know</h1>
+                                <div class="faq-item">
+                                        <button class="faq-question">
+                                                <span>What types of services do you offer?</span>
+                                                <span class="icon">+</span>
+                                        </button>
+                                        <div class="faq-answer">
+                                                <p>We provide a wide range of handyman services including plumbing,
+                                                        electrical
+                                                        work, carpentry, painting, drywall repair, appliance
+                                                        installation,
+                                                        furniture assembly, and general home maintenance.</p>
+                                        </div>
+                                </div>
+                                <div class="faq-item">
+                                        <button class="faq-question">
+                                                <span>How do I schedule a service appointment?</span>
+                                                <span class="icon">+</span>
+                                        </button>
+                                        <div class="faq-answer">
+                                                <p>To schedule a service appointment, you can contact us via phone or
+                                                        our
+                                                        website. We will coordinate with you to find a convenient time.
+                                                </p>
+                                        </div>
+                                </div>
+                                <div class="faq-item">
+                                        <button class="faq-question">
+                                                <span>What are your rates and how do you charge for services?</span>
+                                                <span class="icon">+</span>
+                                        </button>
+                                        <div class="faq-answer">
+                                                <p>Our rates vary depending on the type of service. We provide an
+                                                        upfront
+                                                        estimate before starting any work.</p>
+                                        </div>
+                                </div>
+                                <div class="faq-item">
+                                        <button class="faq-question">
+                                                <span>Are you licensed and insured?</span>
+                                                <span class="icon">+</span>
+                                        </button>
+                                        <div class="faq-answer">
+                                                <p>Yes, we are fully licensed and insured for your peace of mind.</p>
+                                        </div>
+                                </div>
+                                <div class="faq-item">
+                                        <button class="faq-question">
+                                                <span>Do you offer any guarantees or warranties on your work?</span>
+                                                <span class="icon">+</span>
+                                        </button>
+                                        <div class="faq-answer">
+                                                <p>We offer a satisfaction guarantee on all our services. Specific
+                                                        warranties
+                                                        depend on the type of service provided.</p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="faq_img">
+                                <img src="../images/faq-image.webp"/>
+                        </div>
+                </div>
+
+        </div>
+        <script>
+
+
+                document.querySelectorAll('.faq-question').forEach(button => {
+                        button.addEventListener('click', () => {
+                                const faqItem = button.parentElement;
+                                const isActive = faqItem.classList.contains('active');
+
+                                document.querySelectorAll('.faq-item').forEach(item => {
+                                        item.classList.remove('active');
+                                });
+
+                                if (!isActive) {
+                                        faqItem.classList.add('active');
+                                }
+                        });
+                });
+
+
+        </script>
+
+
+
+
+{% endblock content %}
